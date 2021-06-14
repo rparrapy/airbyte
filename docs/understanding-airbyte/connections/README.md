@@ -6,8 +6,11 @@ A connection is a configuration for syncing data between a source and a destinat
 * Destination [Namespace](../namespaces.md) and stream names: where the data will end up being written.
 * A catalog selection: which [streams and fields](../catalog.md) to replicate from the source.
 * Sync mode: how each stream should be replicated (read & write behaviors).
+* Optional transformations: how to convert Airbyte protocol messages (raw JSON blob) data into some other data representations.
 
 ## Sync schedules
+
+Sync schedules are explained below. For information about catalog selections, see [AirbyteCatalog & ConfiguredAirbyteCatalog](../catalog.md).
 
 Syncs will be triggered by either:
 
@@ -59,3 +62,20 @@ A sync mode is therefore, a combination of a source and destination mode togethe
 * [Full Refresh Append](full-refresh-append.md): Sync the whole stream and append data in destination.
 * [Incremental Append](incremental-append.md): Sync new records from stream and append data in destination.
 * [Incremental Deduped History](incremental-deduped-history.md): Sync new records from stream and append data in destination, also provides a de-duplicated view mirroring the state of the stream in the source.
+
+## Optional operations
+
+### Airbyte basic normalization
+
+As described by the [Airbyte Protocol from the Airbyte Specifications](../airbyte-specification.md), a replication is composed of source connectors that are transmitting data in a JSON format. It is then written as such by the destination connectors. 
+
+On top of this replication, Airbyte provides the option to enable or disable an additional transformation step at the end of the sync called [basic normalization](../basic-normalization.md). This operation is:
+
+- only available for destinations that support dbt execution.
+- responsible for automatically generating a pipeline or a DAG of dbt transformation models to convert JSON blob objects into normalized tables.
+- responsible for running and applying these dbt models to the data written in the destination.
+
+### Custom sync operations
+
+Further operations can be included in a sync on top of Airbyte basic normalization (or even to replace it completely).
+See [operations](../operations.md) for more details.
